@@ -1,0 +1,13 @@
+# Generated files
+build*
+
+
+#editor stuff
+*~
+*.swp
+*.*project
+*.*workspace
+
+
+#archive for uploading
+*.zip
