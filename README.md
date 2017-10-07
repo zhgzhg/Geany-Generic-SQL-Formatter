@@ -32,3 +32,8 @@ To compile run: `make`
 To install (you may need root privileges) run: `make install`
 
 To uninstall (you may need root privileges) run: `make uninstall`
+
+Other Useful Plugins
+--------------------
+* [Geany JSON Prettifier](https://github.com/zhgzhg/Geany-JSON-Prettifier)
+* [Geany Unix Timestamp Converter](https://github.com/zhgzhg/Geany-Unix-Timestamp-Converter)
