@@ -33,6 +33,10 @@ To install (you may need root privileges) run: `make install`
 
 To uninstall (you may need root privileges) run: `make uninstall`
 
+Attention MacOS users - this plugin will work with the manually
+installed and compiled Geany editor from source code. It will not work
+with the version installed from dmg files.
+
 Other Useful Plugins
 --------------------
 * [Geany JSON Prettifier](https://github.com/zhgzhg/Geany-JSON-Prettifier)
