@@ -51,7 +51,7 @@ PLUGIN_SET_TRANSLATABLE_INFO(LOCALEDIR,
 	_("Generic SQL Formatter"),
 	_("SQL file formatter that covers the basic SQL syntax.\n\
 https://github.com/zhgzhg/Geany-Generic-SQL-Formatter"),
-	"1.0",
+	"1.0.1",
 	"zhgzhg @@ github.com\n\
 https://github.com/zhgzhg/Geany-Generic-SQL-Formatter"
 );
