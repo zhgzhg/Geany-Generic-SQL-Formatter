@@ -20,6 +20,7 @@ Dependencies:
 * geany, geany-dev(el), geany-plugins-common
 * gtk+2.0-dev(el)
 * fsqlf --- version(1.0.0-prealpha-02) --- integrated in this repository
+* flex
 
 * make
 * cmake
