@@ -16,6 +16,7 @@ prettify and then click on Tools/SQL Formatter.
 Requirements
 ------------
 	* fsqlf >= v1.0.0-prealpha-02
+	* flex
 
 
 Installation
