@@ -18,7 +18,7 @@ all: prepare build
 
 prepare:
 	rm -fr ./fsqlf-1.0.0-prealpha-02/build && mkdir ./fsqlf-1.0.0-prealpha-02/build
-	cd ./fsqlf-1.0.0-prealpha-02/build && cmake ../lib_fsqlf
+	cd ./fsqlf-1.0.0-prealpha-02/build && CFLAGS="-fPIC" cmake ../lib_fsqlf
 	cp -fr ./fsqlf-1.0.0-prealpha-02/include/* ./fsqlf-1.0.0-prealpha-02/build
 	cd ./fsqlf-1.0.0-prealpha-02/build && make libfsqlf_static
 
