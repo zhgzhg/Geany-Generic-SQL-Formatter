@@ -29,10 +29,11 @@ build:
 install: uninstall startinstall
 
 startinstall:
-	cp -f ./genericsqlformatter.so $(libdir)
-	chmod 755 $(libdir)/genericsqlformatter.so
+	cp -f ./genericsqlformatter.so "$(libdir)/genericsqlformatter.so"
+	chmod 755 "$(libdir)/genericsqlformatter.so"
 
 uninstall:
+	rm -f "$(libdir)/genericsqlformatter.so"
 	rm -f $(libdir)/genericsqlformatter.*
 
 clean:
