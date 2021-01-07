@@ -30,15 +30,25 @@ build:
 	gcc -DLOCALEDIR=\"\" -DGETTEXT_PACKAGE=\"zhgzhg\" -c ./geany_generic_sql_formatter.c -fPIC `pkg-config --cflags geany`
 	gcc geany_generic_sql_formatter.o -o genericsqlformatter.so "././fsqlf-1.0.0-prealpha-02/build/liblibfsqlf_static.a" $(CFLAGS) `pkg-config --libs geany`
 
-install: uninstall startinstall
+install: globaluninstall globalinstall localuninstall
 
-startinstall:
+uninstall: globaluninstall
+
+globaluninstall:
+	rm -f "$(libdir)/genericsqlformatter.so"
+	rm -f $(libdir)/genericsqlformatter.*
+
+globalinstall:
 	cp -f ./genericsqlformatter.so "$(libdir)/genericsqlformatter.so"
 	chmod 755 "$(libdir)/genericsqlformatter.so"
 
-uninstall:
-	rm -f "$(libdir)/genericsqlformatter.so"
-	rm -f $(libdir)/genericsqlformatter.*
+localinstall: localuninstall
+	mkdir -p "$(HOME)/.config/geany/plugins"
+	cp -f ./genericsqlformatter.so "$(HOME)/.config/geany/plugins/genericsqlformatter.so"
+	chmod 755 "$(HOME)/.config/geany/plugins/genericsqlformatter.so"
+
+localuninstall:
+	rm -f "$(HOME)/.config/geany/plugins/genericsqlformatter.so"
 
 clean:
 	rm -f ./genericsqlformatter.so
