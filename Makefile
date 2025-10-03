@@ -1,7 +1,8 @@
-libdir.x86_64 := $(shell if [ -d "/usr/lib/x86_64-linux-gnu" ]; then echo "/usr/lib/x86_64-linux-gnu"; else echo "/usr/lib64"; fi )
-libdir.i686   := $(shell if [ -d "/usr/lib/i386-linux-gnu" ]; then echo "/usr/lib/i386-linux-gnu"; else echo "/usr/lib"; fi )
-libdir.arm    := $(shell if [ -d "/usr/lib/arm-linux-gnueabihf" ]; then echo "/usr/lib/arm-linux-gnueabihf"; else echo "/usr/lib"; fi )
-libdir.macos  := /usr/local/lib
+libdir.x86_64  := $(shell if [ -d "/usr/lib/x86_64-linux-gnu" ]; then echo "/usr/lib/x86_64-linux-gnu"; else echo "/usr/lib64"; fi )
+libdir.i686    := $(shell if [ -d "/usr/lib/i386-linux-gnu" ]; then echo "/usr/lib/i386-linux-gnu"; else echo "/usr/lib"; fi )
+libdir.arm     := $(shell if [ -d "/usr/lib/arm-linux-gnueabihf" ]; then echo "/usr/lib/arm-linux-gnueabihf"; else echo "/usr/lib"; fi )
+libdir.aarch64 := $(shell if [ -d "/usr/lib/aarch64-linux-gnu" ]; then echo "/usr/lib/aarch64-linux-gnu"; else echo "/usr/lib"; fi )
+libdir.macos   := /usr/local/lib
 
 ISNOTMACOS := $(shell uname -a | grep "Darwin" >/dev/null ; echo $$? )
 
@@ -13,6 +14,7 @@ else
 	ifneq (, $(findstring armv, $(MACHINE)))
 		 MACHINE := arm
 	endif
+
 	CFLAGS := -shared
 endif
 
@@ -54,3 +56,5 @@ clean:
 	rm -f ./genericsqlformatter.so
 	rm -f ./genericsqlformatter.o
 	rm -fr ./fsqlf-1.0.0-prealpha-02/build
+
+.PHONY: all prepare build install uninstall globaluninstall globalinstall localinstall localuninstall clean
