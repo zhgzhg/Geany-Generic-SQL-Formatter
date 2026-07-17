@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.12)
 project(fsqlf_lib)
 # Formatter as library - shared and static.
 

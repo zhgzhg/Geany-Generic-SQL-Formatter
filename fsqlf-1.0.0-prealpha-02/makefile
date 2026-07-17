@@ -39,14 +39,23 @@ else
 	CXX=g++
 	CXXFLAGS+= `wx-config --cxxflags`
 	LDFLAGS+= `wx-config --libs`
-	ifneq (Darwin, ${_system_type})
-		CFLAGS+=-m32
-	else
+	# Auto-detect host OS and architecture to set 32/64-bit flags.
+	# On Darwin keep previous behaviour (explicit -m64), on Linux only add
+	# -m32 when building on 32-bit x86 hosts. This avoids hardcoding.
+	_system_type := $(shell uname -s)
+	_system_arch := $(shell uname -m)
+	ifeq ($(_system_type),Darwin)
 		CFLAGS+=-m64
+	else
+		ifneq (,$(filter i386 i486 i586 i686,$(_system_arch)))
+			CFLAGS+=-m32
+		endif
 	endif
+	# When building shared libraries on Unix/Linux, PIC is required.
+	CFLAGS+=-fPIC
 endif
 
-ifeq (Darwin, ${_system_type})
+ifeq ($(_system_type),Darwin)
 	LIBNAME=$(BLD)/libfsqlf.dylib
 	LIBFLAGS=-dynamiclib
 else

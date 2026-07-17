@@ -6,16 +6,29 @@ libdir.macos   := /usr/local/lib
 
 ISNOTMACOS := $(shell uname -a | grep "Darwin" >/dev/null ; echo $$? )
 
-ifeq ($(ISNOTMACOS), 0)
+ifeq ($(OS),Windows_NT)
+	# Native Windows build under MSYS2 (MinGW gcc from a MINGW32/64 shell).
+	MACHINE := windows
+	PLUGIN := genericsqlformatter.dll
+	CFLAGS := -shared -Wl,--export-all-symbols
+	# MSYS2's Geany loads plugins from <libdir>/geany (e.g. /mingw64/lib/geany).
+	libdir.windows := $(shell pkg-config --variable=libdir geany)
+	# Per-user plugin dir of Geany on Windows.
+	PLUGIN_USER_DIR := $(APPDATA)/geany/plugins
+else ifeq ($(ISNOTMACOS), 0)
 	MACHINE := macos
+	PLUGIN := genericsqlformatter.so
 	CFLAGS := -bundle
+	PLUGIN_USER_DIR := $(HOME)/.config/geany/plugins
 else
 	MACHINE := $(shell uname -m)
 	ifneq (, $(findstring armv, $(MACHINE)))
 		 MACHINE := arm
 	endif
 
+	PLUGIN := genericsqlformatter.so
 	CFLAGS := -shared
+	PLUGIN_USER_DIR := $(HOME)/.config/geany/plugins
 endif
 
 libdir = $(libdir.$(MACHINE))/geany
@@ -26,35 +39,35 @@ prepare:
 	rm -fr ./fsqlf-1.0.0-prealpha-02/build && mkdir ./fsqlf-1.0.0-prealpha-02/build
 	cd ./fsqlf-1.0.0-prealpha-02/build && CFLAGS="-fPIC" cmake ../lib_fsqlf
 	cp -fr ./fsqlf-1.0.0-prealpha-02/include/* ./fsqlf-1.0.0-prealpha-02/build
-	cd ./fsqlf-1.0.0-prealpha-02/build && make libfsqlf_static
+	cd ./fsqlf-1.0.0-prealpha-02/build && cmake --build . --target libfsqlf_static
 
 build:
-	gcc -DLOCALEDIR=\"\" -DGETTEXT_PACKAGE=\"zhgzhg\" -c ./geany_generic_sql_formatter.c -fPIC `pkg-config --cflags geany`
-	gcc geany_generic_sql_formatter.o -o genericsqlformatter.so "././fsqlf-1.0.0-prealpha-02/build/liblibfsqlf_static.a" $(CFLAGS) `pkg-config --libs geany`
+	gcc -DLOCALEDIR=\"\" -DGETTEXT_PACKAGE=\"zhgzhg\" -DSTATIC_LIBFSQLF -c ./geany_generic_sql_formatter.c -fPIC `pkg-config --cflags geany`
+	gcc geany_generic_sql_formatter.o -o $(PLUGIN) "././fsqlf-1.0.0-prealpha-02/build/liblibfsqlf_static.a" $(CFLAGS) `pkg-config --libs geany`
 
 install: globaluninstall globalinstall localuninstall
 
 uninstall: globaluninstall
 
 globaluninstall:
-	rm -f "$(libdir)/genericsqlformatter.so"
+	rm -f "$(libdir)/$(PLUGIN)"
 	rm -f $(libdir)/genericsqlformatter.*
 
 globalinstall:
-	cp -f ./genericsqlformatter.so "$(libdir)/genericsqlformatter.so"
-	chmod 755 "$(libdir)/genericsqlformatter.so"
+	cp -f ./$(PLUGIN) "$(libdir)/$(PLUGIN)"
+	chmod 755 "$(libdir)/$(PLUGIN)"
 
 localinstall: localuninstall
-	mkdir -p "$(HOME)/.config/geany/plugins"
-	cp -f ./genericsqlformatter.so "$(HOME)/.config/geany/plugins/genericsqlformatter.so"
-	chmod 755 "$(HOME)/.config/geany/plugins/genericsqlformatter.so"
+	mkdir -p "$(PLUGIN_USER_DIR)"
+	cp -f ./$(PLUGIN) "$(PLUGIN_USER_DIR)/$(PLUGIN)"
+	chmod 755 "$(PLUGIN_USER_DIR)/$(PLUGIN)"
 
 localuninstall:
-	rm -f "$(HOME)/.config/geany/plugins/genericsqlformatter.so"
+	rm -f "$(PLUGIN_USER_DIR)/$(PLUGIN)"
 
 clean:
-	rm -f ./genericsqlformatter.so
-	rm -f ./genericsqlformatter.o
+	rm -f ./genericsqlformatter.so ./genericsqlformatter.dll
+	rm -f ./geany_generic_sql_formatter.o
 	rm -fr ./fsqlf-1.0.0-prealpha-02/build
 
 .PHONY: all prepare build install uninstall globaluninstall globalinstall localinstall localuninstall clean
