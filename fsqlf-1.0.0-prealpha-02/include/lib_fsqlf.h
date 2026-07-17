@@ -138,5 +138,11 @@ FSQLF_API void fsqlf_format_bytes(fsqlf_kwmap_t kwmap,
     const char *bytes_in, int len, char **bytes_out
 );
 
+// Release memory returned by the library (e.g. bytes_out of
+// fsqlf_format_bytes). Guarantees the same allocator that produced
+// the memory frees it, which matters when the library is a dll and
+// the caller uses a different C runtime.
+FSQLF_API void fsqlf_free(void *mem);
+
 
 #endif

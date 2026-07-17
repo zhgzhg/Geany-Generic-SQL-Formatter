@@ -1,7 +1,7 @@
 /*
  * geany_generic_sql_formatter.c - a Geany plugin to format SQL files
  *
- *  Copyright 2017 zhgzhg @ github.com
+ *  Copyright 2026 zhgzhg @ github.com
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser  General Public License as
@@ -44,14 +44,14 @@ GeanyData *geany_data;
 
 static gchar *plugin_config_path = NULL;
 
-PLUGIN_VERSION_CHECK(231)
+PLUGIN_VERSION_CHECK(235)
 
 PLUGIN_SET_TRANSLATABLE_INFO(LOCALEDIR,
 	GETTEXT_PACKAGE,
 	_("Generic SQL Formatter"),
 	_("SQL file formatter that covers the basic SQL syntax.\n\
 https://github.com/zhgzhg/Geany-Generic-SQL-Formatter"),
-	"1.0.2",
+	"1.1.0",
 	"zhgzhg @@ github.com\n\
 https://github.com/zhgzhg/Geany-Generic-SQL-Formatter"
 );
@@ -80,28 +80,34 @@ static void my_sql_format(GeanyDocument *doc)
 		if (text_string != NULL)
 		{
 			workWithTextSelection = TRUE;
-			text_len =
-				sci_get_selected_text_length(doc->editor->sci) + 1;
+			text_len = (gint) strlen(text_string);
 		}
 	}
 	else
 	{	/* Work with the entire file */
 		text_len = sci_get_length(doc->editor->sci);
 		if (text_len == 0) return;
-		++text_len;
 		text_string = sci_get_contents(doc->editor->sci, -1);
 	}
 
 	if (text_string == NULL) return;
+	if (text_len == 0)
+	{
+		g_free(text_string);
+		return;
+	}
 
 	/* begin the formatting process */
 
-    fsqlf_format_bytes(
+	fsqlf_format_bytes(
 		kwmap, (const char *)text_string, text_len, &formatted_string);
+
+	g_free(text_string);
+
+	if (formatted_string == NULL) return;
 
 	{
 		gint spos;
-		gboolean insertNewLineAtTheEnd = FALSE;
 
 		if (!workWithTextSelection)
 		{
@@ -131,8 +137,7 @@ static void my_sql_format(GeanyDocument *doc)
 		sci_set_current_position(
 			doc->editor->sci, cursPos - colPos, TRUE);
 
-		if (formatted_string != NULL)
-		{ free(formatted_string); }
+		fsqlf_free(formatted_string);
 	}
 }
 
@@ -199,7 +204,7 @@ void plugin_init(GeanyData *data)
 					geany_plugin, _("generic_sql_formatter"), 1, NULL);
 
 
-	/* Shift + Alt + q to format */
+	/* Ctrl + Shift + Q to format (Cmd + Shift + Q on macOS) */
 	keybindings_set_item(geany_key_group, 0,
 						 kb_run_generic_sql_formatter,
                          GDK_q, GEANY_PRIMARY_MOD_MASK | GDK_SHIFT_MASK,

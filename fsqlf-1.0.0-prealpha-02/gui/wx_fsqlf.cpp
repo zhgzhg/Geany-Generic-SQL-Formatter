@@ -237,12 +237,14 @@ void FsqlfGui::onFormat(wxCommandEvent &event)
     // Actual formatting.
     wxCharBuffer buffer = this->original_text.ToUTF8();
     const char *input =  buffer.data();
-    char *output;
+    char *output = NULL;
     fsqlf_format_bytes(kwmap, input, strlen(input), &output);
-    this->text_area->SetValue(wxString(output, wxConvUTF8));
+    if (output != NULL) {
+        this->text_area->SetValue(wxString(output, wxConvUTF8));
+    }
 
     // Cleanup of kwmap.
-    free(output);
+    fsqlf_free(output);
     fsqlf_kwmap_destroy(kwmap);
 }
 

@@ -197,10 +197,22 @@ static void print_output(
     } else {
         size_t len_spacing = strlen(spacing_txt);
         size_t len_text = strlen(text);
-        if (bout->len_used + len_spacing + len_text + 1 > bout->len_alloc) {
-            size_t len_realloc = bout->len_alloc * 1.5;
-            bout->buffer = realloc(bout->buffer, len_realloc);
-            assert(bout->buffer);
+        size_t len_needed = bout->len_used + len_spacing + len_text + 1;
+        if (len_needed > bout->len_alloc) {
+            // Grow until the whole append fits - a single token
+            // (string literal, comment) can be arbitrarily long.
+            size_t len_realloc = bout->len_alloc;
+            while (len_realloc < len_needed) {
+                len_realloc += len_realloc / 2 + 1;
+            }
+            char *buffer_new = realloc(bout->buffer, len_realloc);
+            assert(buffer_new);
+            if (buffer_new == NULL) {
+                // Out of memory: skip this token rather than overflow.
+                free(spacing_txt);
+                return;
+            }
+            bout->buffer = buffer_new;
             bout->len_alloc = len_realloc;
         }
         strncpy(bout->buffer + bout->len_used, spacing_txt, len_spacing);

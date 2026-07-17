@@ -15,8 +15,15 @@ void fsqlf_format_bytes(fsqlf_kwmap_t kwmap,
     f_state.right_p = 0;
     f_state.kwall = kwmap;
     f_state.bout.len_used = 0;
-    f_state.bout.len_alloc = len * 1.5;
+    f_state.bout.len_alloc = len * 1.5 + 1;
     f_state.bout.buffer = malloc(f_state.bout.len_alloc);
+    if (f_state.bout.buffer == NULL) {
+        *bytes_out = NULL;
+        return;
+    }
+    // Inputs yielding no output tokens never write to the buffer,
+    // so terminate it upfront.
+    f_state.bout.buffer[0] = '\0';
 
     yyscan_t scanner;
     yylex_init(&scanner);
@@ -27,6 +34,12 @@ void fsqlf_format_bytes(fsqlf_kwmap_t kwmap,
     *bytes_out = f_state.bout.buffer;
 
     yylex_destroy(scanner);
+}
+
+
+void fsqlf_free(void *mem)
+{
+    free(mem);
 }
 
 
